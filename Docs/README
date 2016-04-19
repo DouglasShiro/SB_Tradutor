@@ -1,0 +1,18 @@
+/**********************************************************************
+*                   UNIVERSIDADE DE BRASILIA
+*               CIC 116432 SOFTWARE BASICO 1/2016 
+*                     1º Trabalho Pratico 
+*    
+*   Professor: Bruno Macchiavello
+*
+*   Grupo:  Andressa Valadares          13/0042943
+*           Douglas Shiro Yokoyama      13/0024902
+************************************************************************/
+
+Objetivo:
+    Fixar o funcionamento de um processo de traducao. Especificamente as etapas
+de analise lexica, sintatica e semantica e a etapa de geracao de codigo objeto.
+
+
+
+
