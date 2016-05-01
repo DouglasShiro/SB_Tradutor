@@ -16,7 +16,7 @@
 */
 /* Insere na lista de tokens
 Funcao:
-  Inserir em determinada tabela os dados de 
+  Inserir em determinada tabela os dados de
 
 Entrada:
   char* simb;
@@ -41,7 +41,7 @@ Tab_lst* insert_tab_lst(Tab_lst* tableLst, char* simb, int valor){
     Tab_lst* new = (Tab_lst*) malloc(sizeof(Tab_lst));
 
 	  strcpy(new->simb, simb);
-    new->valor;
+    new->valor = valor;
 
     if(tableLst == NULL)
     {
@@ -78,7 +78,7 @@ void print_tab_lst(Tab_lst* tableLst){
 Tab_lst* remove_tab_lst(Tab_lst* tableLst){
     Tab_lst* aux = tableLst->next;
 
-    free(tablelst);
+    free(tableLst);
 
     tableLst = aux;
 
@@ -95,22 +95,22 @@ Tab_lst* remove_tab_lst(Tab_lst* tableLst){
 */
 
 /* Insere na lista de tokens */
-Tab_lst* insert_tab_hash(Tab_hash* tableHash, char* minemonico, int op, int cod, int tam){
-
-    return tableTok;
-}
-
-/* Inicializa tabela de tokens*/
-Tab_hash* inicialize_tab_hash(void){
-    return NULL;
-}
-
-/* Imprime a lista de tokens*/
-void print_tab_hash(Tab_hash* tableHash){
-
-}
-
-/* Remove um token da lista*/
-Tab_hash* remove_tab_hash(Tab_hash* tableHash){
-    return tableTok;
-}
+// /Tab_lst* insert_tab_hash(Tab_hash* tableHash, char* minemonico, int op, int cod, int tam){
+//
+//     return tableTok;
+// }
+//
+// /* Inicializa tabela de tokens*/
+// Tab_hash* inicialize_tab_hash(void){
+//     return NULL;
+// }
+//
+// /* Imprime a lista de tokens*/
+// void print_tab_hash(Tab_hash* tableHash){
+//
+// }
+//
+// /* Remove um token da lista*/
+// Tab_hash* remove_tab_hash(Tab_hash* tableHash){
+//     return tableTok;
+// }

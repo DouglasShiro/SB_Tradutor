@@ -1,6 +1,6 @@
 /*  Estrutura de dados TABELAS
-*     - Tabela de simbolos
 *     - Tabela de diretivas
+*     - Tabela de simbolos
 *     - Tabela de definicoes
 *     - Tabela uso
 */
@@ -15,7 +15,7 @@
 typedef struct TAB_LST{
   char* simb;
   int valor;
-  struct TAB_USO* proximo;
+  struct TAB_LST* next;
 }Tab_lst;
 
 Tab_lst* insert_tab_lst(Tab_lst* tableLst, char* simb, int valor);
@@ -27,7 +27,7 @@ Tab_lst* remove_tab_lst(Tab_lst* tableLst);
   - Instrucoes
   - Diretivas
 */
-typedef struct TAB_HASH{
+/*typedef struct TAB_HASH{
   char minemonico[10];
   int op;
   int cod;
@@ -38,3 +38,4 @@ Tab_hash* insert_tab_hash(Tab_hash* tableHash, char* minemonico, int op, int cod
 Tab_hash* inicialize_tab_hash(void);
 void print_tab_hash(Tab_hash* tableHash);
 Tab_hash* remove_tab_hash(Tab_hash* tableHash);
+*/
