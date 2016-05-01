@@ -46,8 +46,20 @@ int main(int argc, char** argv){
       /*verifica erro na abertura do arquivo*/
       if((moda != NULL) && (modb != NULL) && (out != NULL)){
 
-        /*Alinhamento codigos objeto*/
-        while(fscanf(moda, "%s ", endData) != EOF){
+        /*Leitura codigos objeto*/
+        while(fscanf(moda, "%s ", dado) != EOF){
+          if(strcmp(dado, "TABLE") == 0){
+            fscanf(moda, "%s", dado)
+            if(strcmp(dado, "USE") == 0){
+
+            }else if(strcmp(dado, "DEFINITION") == 0){
+
+            }else{
+              return 0;  
+            }
+
+            }
+          }
             printf("%s ", endData);
             fprintf (out, "%s ", endData);
             //tamanho arquivo obj
