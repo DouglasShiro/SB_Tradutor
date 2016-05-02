@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define TAM_HASH 67
 
 /*Estrutura de lista para armazenar os dados das tabelas:
   - Uso.
@@ -27,15 +28,17 @@ Tab_lst* remove_tab_lst(Tab_lst* tableLst);
   - Instrucoes
   - Diretivas
 */
-/*typedef struct TAB_HASH{
-  char minemonico[10];
-  int op;
-  int cod;
-  int tam;
+typedef struct TAB_HASH{
+  char* name; /* Mnemonico*/
+  int op; /* Operandos*/
+  int cod; /* Codigo/opcode*/
+  int tam; /* tamanho */
 }Tab_hash;
 
 Tab_hash* insert_tab_hash(Tab_hash* tableHash, char* minemonico, int op, int cod, int tam);
 Tab_hash* inicialize_tab_hash(void);
+int inicialize_dir_inst(Tab_hash* tableDI);
 void print_tab_hash(Tab_hash* tableHash);
 Tab_hash* remove_tab_hash(Tab_hash* tableHash);
-*/
+int return_key(char* str);
+
