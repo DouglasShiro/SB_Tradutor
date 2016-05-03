@@ -40,7 +40,7 @@ Tab_lst* insert_tab_lst(Tab_lst* tableLst, char* simb, int valor){
     Tab_lst* aux;
     Tab_lst* new = (Tab_lst*) malloc(sizeof(Tab_lst));
 
-	strcpy(new->simb, simb);
+	  strcpy(new->simb, simb);
     new->valor = valor;
 
     if(tableLst == NULL)
@@ -57,16 +57,12 @@ Tab_lst* insert_tab_lst(Tab_lst* tableLst, char* simb, int valor){
     return tableLst;
 }
 
-/* Inicializa tabela de tokens
-  Igual para todas as tabelas
-*/
+/* Inicializa tabela*/
 Tab_lst* inicialize_tab_lst(void){
     return NULL;
 }
 
-/* Imprime a lista de tokens
-
-*/
+/* Imprime a tabela*/
 void print_tab_lst(Tab_lst* tableLst){
     Tab_lst* aux;
 
@@ -74,7 +70,7 @@ void print_tab_lst(Tab_lst* tableLst){
         printf("%s\t%d\n", aux->simb, aux->valor);
 }
 
-/* Remove um token da lista*/
+/* Remove um elemento da lista*/
 Tab_lst* remove_tab_lst(Tab_lst* tableLst){
     Tab_lst* aux = tableLst->next;
 
@@ -85,6 +81,14 @@ Tab_lst* remove_tab_lst(Tab_lst* tableLst){
     return tableLst;
 }
 
+int procura_tab_lst(Tab_lst* tableLst, char* simb){
+    Tab_lst* aux = tableLst;
+
+    while(strcmp(aux->simb, simb) != 0){
+        aux = aux->next;
+    }
+return aux->valor;
+}
 /*************************************************************************************/
 /*          TABELA HASH
     -Tabela de Instrucoes
@@ -104,9 +108,9 @@ int inicialize_dir_inst(Tab_hash* tableDI)
 					"JMP", "JMPN", "JMPP","JMPZ",
 					"COPY", "LOAD", "STORE", "INPUT",
 					"OUTPUT", "STOP"};
-					
+
 	char* dir_0[4] = {"PUBLIC","EXTERN", "BEGIN", "END"};
-	
+
 	char* dir_1[5] = {"SECTION", "SPACE", "CONST","EQU", "IF"};
 
 
@@ -115,13 +119,13 @@ int inicialize_dir_inst(Tab_hash* tableDI)
 	for(i = 0; i < 14; i++)
 	{
 		aux = return_key(inst[i]);
-		
+
 		if(tableDI[aux].name != NULL)
 			printf("CHAVE REPETIDA - [%d]", aux);
-			
+
 		tableDI[aux].name = inst[i];
 		tableDI[aux].cod = i+1;
-		
+
 		/* Para o COPY*/
 		if(strcmp(inst[i],"COPY"))
 		{
@@ -138,41 +142,41 @@ int inicialize_dir_inst(Tab_hash* tableDI)
 			tableDI[aux].tam = 2;
 			tableDI[aux].op = 1;
 		}
-		
-	}	
-	
+
+	}
+
 	/* Diretivas com OP = 0*/
 	for(i = 0; i < 4; i++)
 	{
 		aux = return_key(dir_0[i]);
-		
+
 		if(tableDI[aux].name != NULL)
 			printf("CHAVE REPETIDA - [%d]", aux);
-			
+
 		tableDI[aux].name = dir_0[i];
 		tableDI[aux].tam = 0;
 		tableDI[aux].op = 0;
 	}
-	
+
 	/* Diretivas com OP = 1*/
 	for(i = 0; i < 5; i++)
 	{
 		aux = return_key(dir_1[i]);
 		if(tableDI[aux].name != NULL)
 			printf("CHAVE REPETIDA - [%d]", aux);
-		
+
 		tableDI[aux].name = dir_1[i];
 		tableDI[aux].op = 1;
-		
+
 		if(strcmp(dir_1[i], "SPACE") || strcmp(dir_1[i], "SPACE"))
 		{
-			tableDI[aux].tam = 1;	
-		} 
+			tableDI[aux].tam = 1;
+		}
 		else
 		{
 			tableDI[aux].tam = 0;
 		}
-	}	
+	}
 
 	return 0;
 }
@@ -180,7 +184,7 @@ int inicialize_dir_inst(Tab_hash* tableDI)
 int return_key(char* str)
 {
 	int i, key = 0;
-	
+
 	for(i = 0; i < strlen(str); i++)
 	{
 		key += str[i];

@@ -8,13 +8,14 @@
 #include <stdlib.h>
 #include <string.h>
 #define TAM_HASH 67
+#define MAX_SIZE 100
 
 /*Estrutura de lista para armazenar os dados das tabelas:
   - Uso.
   - Definicao
 */
 typedef struct TAB_LST{
-  char* simb;
+  char simb[MAX_SIZE];
   int valor;
   struct TAB_LST* next;
 }Tab_lst;
@@ -23,6 +24,7 @@ Tab_lst* insert_tab_lst(Tab_lst* tableLst, char* simb, int valor);
 Tab_lst* inicialize_tab_lst(void);
 void print_tab_lst(Tab_lst* tableLst);
 Tab_lst* remove_tab_lst(Tab_lst* tableLst);
+int procura_tab_lst(Tab_lst* Tabela, char* simb);
 
 /*Estruta hash para armazenar os dados das tabelas
   - Instrucoes
@@ -41,4 +43,3 @@ int inicialize_dir_inst(Tab_hash* tableDI);
 void print_tab_hash(Tab_hash* tableHash);
 Tab_hash* remove_tab_hash(Tab_hash* tableHash);
 int return_key(char* str);
-
