@@ -23,16 +23,10 @@ criar tabela global de definicoes
 */
 
 #include "ligador.h"
-#include "tabelas.h"
 
 int main(int argc, char** argv){
 
-    char rotulo[10];
-    char secao[10];
     char* nomeArquivo;
-
-    int dado;
-    int fatorCorrecao = 0;
 
     /*MODULOS*/
     FILE *modA;
@@ -40,11 +34,15 @@ int main(int argc, char** argv){
     FILE *out;
 
     /*TABELAS*/
-    Tab_lst* FatorCorrecao;
-    Tab_lst* TabGlobalDef;
-    Tab_lst* TabUso;
-    Tab_lst* TabDef;
-    Tab_lst* TabRel;
+    Tab_lst* TabUsoA = inicialize_tab_lst();
+    Tab_lst* TabDefA = inicialize_tab_lst();
+    // Tab_lst* TabRelA = inicialize_tab_lst();
+    Tab_lst* TabUsoB = inicialize_tab_lst();
+    Tab_lst* TabDefB = inicialize_tab_lst();
+    // Tab_lst* TabRelB = inicialize_tab_lst();
+    // Tab_lst* TabCodeA = inicialize_tab_lst();
+    // Tab_lst* TabCodeB = inicialize_tab_lst();
+    Tab_lst* TabGlobalDef = inicialize_tab_lst();
 
     if( argc == 4){
         nomeArquivo = argv[1];
@@ -62,70 +60,8 @@ int main(int argc, char** argv){
                 - leitura enderecos relativos
                 - uniao codigos objetos modA e modB
             */
+            Alinhar_codigo(modA, modB, out, &TabUsoA, &TabDefA, &TabUsoB, &TabDefB, &TabGlobalDef);
 
-
-            fscanf(modA, "%s", secao);
-            //printf("%s", secao);
-            if(strcmp(secao, "TABLE") == 0){
-                /*TABLE USE*/
-                //TabUso = inicialize_tab_lst();
-                fscanf(modA, "%s", secao);
-                printf(" %s", secao);
-                while(strcmp(secao, "TABLE") != 0){
-                     /*salva dado da tabela de uso*/
-                     fscanf(modA, "%s", secao);
-                     if(strcmp(secao, "TABLE") != 0){
-                       strcpy(rotulo, secao);
-                       fscanf(modA, "%d", &dado);
-                       //TabUso = insert_tab_lst(TabUso, rotulo, dado);
-                       printf("\nrot :%s", rotulo);
-                       printf("\ndado:%d", dado);
-                     }
-                }
-
-                printf("\n");
-                fscanf(modA, "%s", secao);
-                printf("\n\n%s", secao);
-                /*TABLE DEFINITION*/
-                //TabDef = inicialize_tab_lst();
-                while(strcmp(secao, "RELATIVE") != 0){
-                     /*salva dado da tabela de uso*/
-                     fscanf(modA, "%s", secao);
-                     //printf("secao: %s", secao);
-                     if(strcmp(secao, "RELATIVE") != 0){
-                       strcpy(rotulo, secao);
-                       fscanf(modA, "%d", &dado);
-                       //TabDef = insert_tab_lst(TabDef, rotulo, dado);
-                       printf("\nrot : %s", rotulo);
-                       printf("\ndado: %d", dado);
-                     }
-                }
-
-                printf("\n\nRELATIVE");
-                /*RELATIVE*/
-                //TabRel = inicialize_tab_lst();
-                while(strcmp(secao, "CODE") != 0){
-                    /*salva dado dos enderecos relativos*/
-                    fscanf(modA, "%s ", secao);
-                    if(strcmp(secao, "CODE") != 0){
-                      dado = atoi(secao);
-                      //TabRel = insert_tab_lst(TabRel, NULL, dado);
-                      printf("\ndado: %d", dado);
-                    }
-                }
-                printf("\n\nCODE");
-                /*CODE*/
-                while(fscanf(modA, "%d", &dado)!= EOF){
-                    /*salva dado da secao code*/
-
-                    printf("\ndado: %d", dado);
-                    fatorCorrecao++;
-                }
-                printf("\nend: %d\n", fatorCorrecao);
-
-            }else{
-                printf("arquivo nao possui outro modulo para ser ligado\n\n");
-            }
             fclose(out);
         }else{
             printf("ERRO: falha ao abrir arquivo\n\n");
@@ -133,8 +69,166 @@ int main(int argc, char** argv){
     }else{
         printf("ERRO: argumento(s) invalido(s).");
     }
+
+    printf("\nTab uso MODA\n");
+    print_tab_lst(TabUsoA);
+    printf("\nTab def MODA\n");
+    print_tab_lst(TabDefA);
+    printf("\nTab uso MODB\n");
+    print_tab_lst(TabUsoB);
+    printf("\nTab def MODB\n");
+    print_tab_lst(TabDefB);
+    printf("\nTab global\n");
+    print_tab_lst(TabGlobalDef);
+    //printf("\nTab rel MODA\n");
+    // print_tab_lst(TabRelA);
+    // printf("\nTab rel MODB\n");
+    //print_tab_lst(TabRelB);
+    // printf("\nFator de correcao A\n");
+    // printf("%d", fatorCorrecao[0]);
+    // printf("\nFator de correcao B\n");
+    // printf("%d", fatorCorrecao[1]);
+
+
     fclose(modA);
     fclose(modB);
 
     return 0;
+}
+
+void Alinhar_codigo(FILE* modA, FILE* modB, FILE* out, Tab_lst **TabUsoA, Tab_lst **TabDefA, Tab_lst **TabUsoB, Tab_lst **TabDefB, Tab_lst **TabGlobalDef){
+
+  int end;
+  int dado;
+  int fatorCorrecao[2];
+
+  char rotulo[10];
+  char secao[10];
+
+  /*MODULO A*/
+  fscanf(modA, "%s", secao);
+  //printf("%s", secao);
+  if(strcmp(secao, "TABLE") == 0){
+      /*TABLE USE*/
+      fscanf(modA, "%s", secao);
+      //printf(" %s", secao);
+      while(strcmp(secao, "TABLE") != 0){
+           /*salva dado da tabela de uso*/
+           fscanf(modA, "%s", secao);
+           if(strcmp(secao, "TABLE") != 0){
+             strcpy(rotulo, secao);
+             fscanf(modA, "%d", &dado);
+             *TabUsoA = insert_tab_lst(*TabUsoA, rotulo, dado);
+            //  printf("\nrot :%s", rotulo);
+            //  printf("\ndado:%d", dado);
+           }
+      }
+
+      fscanf(modA, "%s", secao);
+      // printf("\n\n%s", secao);
+      /*TABLE DEFINITION*/
+      fatorCorrecao[0] = 0;
+      while(strcmp(secao, "RELATIVE") != 0){
+           /*salva dado da tabela de uso*/
+           fscanf(modA, "%s", secao);
+           //printf("secao: %s", secao);
+           if(strcmp(secao, "RELATIVE") != 0){
+             strcpy(rotulo, secao);
+             fscanf(modA, "%d", &dado);
+             *TabDefA = insert_tab_lst(*TabDefA, rotulo, dado);
+            //  printf("\nrot : %s", rotulo);
+            //  printf("\ndado: %d", dado);
+            *TabGlobalDef = insert_tab_lst(*TabGlobalDef, rotulo, (dado+fatorCorrecao[0]));
+           }
+      }
+
+      // printf("\n\nRELATIVE");
+      /*RELATIVE*/
+      while(strcmp(secao, "CODE") != 0){
+          /*salva dado dos enderecos relativos*/
+          fscanf(modA, "%s ", secao);
+          if(strcmp(secao, "CODE") != 0){
+            dado = atoi(secao);
+            // TabRelA = insert_tab_lst(TabRelA, "endRel", dado);
+            //printf("\ndado: %d", dado);
+          }
+      }
+
+      // printf("\n\nCODE");
+      /*CODE*/
+      while(fscanf(modA, "%d", &dado)!= EOF){
+          /*salva dado da secao code*/
+          fprintf(out, "%d ", dado);
+          //printf("\ndado: %d", dado);
+          fatorCorrecao[1]++;
+      }
+      // printf("\nend: %d\n", fatorCorrecao[1]);
+
+      /*MODULO B*/
+      fscanf(modB, "%s", secao);
+      //printf("%s", secao);
+      if(strcmp(secao, "TABLE") == 0){
+          /*TABLE USE*/
+          fscanf(modB, "%s", secao);
+          //printf(" %s", secao);
+          while(strcmp(secao, "TABLE") != 0){
+               /*salva dado da tabela de uso*/
+               fscanf(modB, "%s", secao);
+               if(strcmp(secao, "TABLE") != 0){
+                 strcpy(rotulo, secao);
+                 fscanf(modB, "%d", &dado);
+                 *TabUsoB = insert_tab_lst(*TabUsoB, rotulo, dado);
+                //  printf("\nrot :%s", rotulo);
+                //  printf("\ndado:%d", dado);
+               }
+          }
+
+          fscanf(modB, "%s", secao);
+          // printf("\n\n%s", secao);
+          /*TABLE DEFINITION*/
+          //fatorCorrecao[0] = 0;
+          while(strcmp(secao, "RELATIVE") != 0){
+               /*salva dado da tabela de uso*/
+               fscanf(modB, "%s", secao);
+               //printf("secao: %s", secao);
+               if(strcmp(secao, "RELATIVE") != 0){
+                 strcpy(rotulo, secao);
+                 fscanf(modB, "%d", &dado);
+                 *TabDefB = insert_tab_lst(*TabDefB, rotulo, dado);
+                //  printf("\nrot : %s", rotulo);
+                //  printf("\ndado: %d", dado);
+                *TabGlobalDef = insert_tab_lst(*TabGlobalDef, rotulo, (dado+fatorCorrecao[1]));
+               }
+          }
+
+          // printf("\n\nRELATIVE");
+          /*RELATIVE*/
+          while(strcmp(secao, "CODE") != 0){
+              /*salva dado dos enderecos relativos*/
+              fscanf(modB, "%s ", secao);
+              if(strcmp(secao, "CODE") != 0){
+                dado = atoi(secao);
+                // TabRelB = insert_tab_lst(TabRelB, "endRel", dado);
+                //printf("\ndado: %d", dado);
+              }
+          }
+
+          // printf("\n\nCODE");
+          /*CODE*/
+          end = 0;
+          while(fscanf(modB, "%d", &dado)!= EOF){
+              /*Verifica se endereco e relativo*/
+              /*salva dado da secao code*/
+              fprintf(out, "%d ", dado);
+              end++;
+              //printf("\ndado: %d", dado);
+          }
+          // printf("\nend: %d\n", fatorCorrecao[1]);
+        }
+
+  }else{
+      printf("arquivo nao possui outro modulo para ser ligado\n\n");
+  }
+
+  return;
 }
