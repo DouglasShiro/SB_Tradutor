@@ -1,6 +1,5 @@
+EQU LA 0
 MOD_A: BEGIN
-
-
 
 SECTION TEXT
 
@@ -11,9 +10,10 @@ SECTION TEXT
 	MOD_B: EXTERN
 	PUBLIC A
 	PUBLIC B
-	PUBLIC L1
+	PUBLIC L1 
 	INPUT A
 	INPUT B
+	IF LA
 	JMP MOD_B 
 	L1: OUTPUT R + 1
 	STOP
@@ -24,4 +24,5 @@ B: SPACE 1
 END
 ;
 ;;;;;;;
-;cometariooooooooooooooooooooooooooooooooooooooooooooo
+;cometariooooooooooooooooooooooooooooooooooooooooooooo 
+
