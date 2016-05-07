@@ -9,7 +9,14 @@
 #include <unordered_map>
 #include <stdlib.h>
 
+#define TRUE 1;
+#define FALSE 0;
+
 using namespace std;
+
+int _erro = FALSE ; 
+int	_sectionText = -1, 	_sectionData = -1;
+
 
 int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 						vector<string> token,	map<string,int> simbTable,
