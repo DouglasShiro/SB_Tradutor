@@ -3,7 +3,6 @@
 int main(int argc, char **argv)
 {
 	int tamanho,  i = 0;
-	char c;
 	locale loc;
 	ifstream inFile;
 	string  nameFile(argv[1]);
@@ -78,15 +77,11 @@ int main(int argc, char **argv)
 			}
 			token.push_back("\n");			
 		}
-			for(vector<string>::iterator i = token.begin(); i < token.end(); i++)
-				cout << *i;
-				
-		
+					
 	/* ja pre processou, -- falta if equ*/
 	
 	primeira_passagem(opTable, dirTable,  token, simbTable, defTable, useTable);
-	
-	
+			
 	
 	}
 	
@@ -142,27 +137,29 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 			}
 			
 			
-		}/* Verifica se eh um operacao */				
+		}
+		/* Verifica se eh um operacao */
 		else if((itOp = opTable.find(token[j])) != opTable.end()){
+		/* Verifica se a instrucao esta na secao TEXT*/
 			if(_sectionText > posCount)	{
 					cout << "ERRO SEMANTICO:" << lineCount << ": A operação está fora da seção de texto \n";
 					_erro = TRUE;
 				
-			}
+			} /* Verifica de a instrucao esta na secao DATA*/
 			else if((_sectionData < posCount) && (_sectionData != -1)){
 					cout << "ERRO SEMANTICO:" << lineCount << ": A operação está fora da seção de texto \n";
 					_erro = TRUE;
 				
 			}
 			
-			
+			/* Caso seja COPY-> tam 3*/
 			if(!itOp->first.compare("COPY")){
 				posCount += 3;
 				cout << itOp->first << "\n";
-			}
+			}/* Caso seja STOP -> tam 1*/
 			else if(!itOp->first.compare("STOP")){
 				posCount += 1;
-			}
+			} /* Todas as outras tam = 2*/
 			else{
 				posCount += 2;
 			}
@@ -171,7 +168,7 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 		}
 		/* Verifica se eh uma diretiva */				
 		else if((it = dirTable.find(token[j])) != dirTable.end()){
-					
+			/* Diretiva SPACE */		
 			if(!it->first.compare("SPACE")){
 				str = token[++j];
 				int space = 0;
@@ -206,6 +203,7 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 				}
 				posCount+= space;
 			}
+			/* Diretiva CONST */
 			else if(!it->first.compare("CONST")){
 				int valor = 0; 
 				str = token[++j];
@@ -241,6 +239,7 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 				
 				posCount+= valor;	
 			}
+			/* Diretiva EXTERN */
 			else if(!it->first.compare("EXTERN")){
 				
 				rotulo = token[j-1].substr(0, token[j-1].length()-1);
@@ -259,8 +258,10 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 				}
 				
 			}
+			/* Diretiva PUBLIC */
 			else if(!it->first.compare("PUBLIC")){
-				rotulo = token[++j];	
+				rotulo = token[++j];
+				/* Verifica se o rotulo ja foi definido */	
 				if((itMod = defTable.find(rotulo)) != defTable.end()){
 					
 					cout << "ERRO SEMANTICO:" << lineCount << ": Rótulo redefinido \"" << rotulo << "\"\n";
@@ -274,23 +275,31 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 
 				}
 			}
+			/* Diretiva EQU */
 			else if(!it->first.compare("EQU")){
-				//~ int valor = 0		
-				//~ rotulo = token[j-1].substr(0, token[j-1].length()-1);
-				//~ if((it = simbTable.find(rotulo)) != simbTable.end()){
+				string valor = token[j+1];	
+				 rotulo = token[j-1].substr(0, token[j-1].length()-1);
+				 if((it = simbTable.find(rotulo)) != simbTable.end()){
 					
-					//~ valor = it->second;
-					//~ simbTable.erase(it);
-					//~ while ((itVec =find(token.begin(), token.end(), rotulo)) != token.end())
-					//~ {
-						
-							
-					//~ }
+					 simbTable.erase(it);
+					 if(find(token.begin(), token.end(), rotulo) != token.end())
+					 {
+						 cout << "valor:	\"" << valor << "\"	rotulo:	\""<< rotulo << "\"\n";
+						 replace(token.begin(), token.end(), rotulo, valor);
+						 		
+					 }
 										
+				}
+				else{
+					cout << "ERRO SINTATICO:" << lineCount << ": Rótulo não definido\n";
+					_erro = TRUE;					
+				}
 			}
+			/* Diretiva BEGIN */
 			else if(!it->first.compare("BEGIN")){
 				begin = 1;				
 			}
+			/* Diretiva END */
 			else if(!it->first.compare("END")){
 				end = 1;
 				if(begin == 0)
@@ -299,21 +308,24 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 					_erro = TRUE;
 				}
 			}
+			/* Diretiva SECTION */
 			else if(!it->first.compare("SECTION")){
 				string operando = token [++j];
-				
+				/* Verifica se o operando eh TEXT */
 				if(!operando.compare("TEXT")){
 					_sectionText = posCount;
 				}
+				/* Verifica se o operando eh DATA */
 				else if(!operando.compare("DATA")){
 					_sectionData = posCount;
-				}
+				} /* Senao erro */
 				else{
 					cout << "ERRO SINTATICO:"<< lineCount <<":"<< posCount <<": Operando inválido, deve ser TEXT ou DATA\n";
 					_erro = TRUE;					
 				}
 			
 			}
+			/* Diretiva IF */
 			else if(!it->first.compare("IF")){
 			}
 						
@@ -321,6 +333,7 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 		
 		}
 		str = "";
+		/* Conta as linhas do programa */
 		if(token[j] == "\n"){
 			lineCount++;
 		}
