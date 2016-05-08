@@ -80,8 +80,7 @@ int main(int argc, char **argv)
 					
 	/* ja pre processou, -- falta if equ*/
 	
-	primeira_passagem(opTable, dirTable,  token, simbTable, defTable, useTable);
-			
+	primeira_passagem(opTable, dirTable,  token, simbTable, defTable, useTable);	
 	
 	}
 	
@@ -96,8 +95,8 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 
 	char c;
 	int existe = 0,  posCount = 0, lineCount = 1, 
-		ok = 1,  k = 0, begin = 0, end = 0;
-	string rotulo, str;
+		begin = 0, end = 0;
+	string rotulo, str, valor;
 	map<string,int>::iterator it;
 	map<string,string>::iterator itOp;
 	unordered_map<string,int>::iterator itMod;
@@ -205,10 +204,9 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 			}
 			/* Diretiva CONST */
 			else if(!it->first.compare("CONST")){
-				int valor = 0; 
 				str = token[++j];
 				
-				/* verifica se o space esta dentro da secao de dados*/
+				/* verifica se o const esta dentro da secao de dados*/
 				if(_sectionData > posCount)
 				{
 					cout << "ERRO SEMANTICO:" << lineCount << ": Diretiva SPACE está fora da seção de dados \n";
@@ -231,13 +229,10 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 						_erro = TRUE;
 						i = str.length();
 					}
-					else{/* Se eh um digito soma a valor para incrementar a posicao*/
-						valor = valor*10 + (c-'0');
-					}
 
 				}
 				
-				posCount+= valor;	
+				posCount+= 1;	
 			}
 			/* Diretiva EXTERN */
 			else if(!it->first.compare("EXTERN")){
@@ -277,7 +272,8 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 			}
 			/* Diretiva EQU */
 			else if(!it->first.compare("EQU")){
-				string valor = token[j+1];	
+				valor = "";
+				valor = token[j+1];	
 				 rotulo = token[j-1].substr(0, token[j-1].length()-1);
 				 if((it = simbTable.find(rotulo)) != simbTable.end()){
 					
@@ -327,6 +323,32 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 			}
 			/* Diretiva IF */
 			else if(!it->first.compare("IF")){
+				rotulo = "";
+				rotulo = token[j+1];
+				/* Se o rotulo existe na tabela de simbolos */			
+				if( simbTable.find(rotulo) != simbTable.end()){
+					
+					cout << "ERRO SEMANTICO:" << lineCount << ": Rótulo redefinido: \"" << rotulo << "\"\n";
+					_erro = TRUE;
+				}
+				else if(!valor.compare("\n")){
+					
+					cout << "ERRO SINTATICO:" << lineCount << ": IF deve possuir um rotulo válido\n";
+					_erro = TRUE;					
+				}
+				else{
+					
+					if(!valor.compare("0"))
+					{
+						
+						cout << "VALORIF: "<< rotulo << "\n";
+						cout<< "SOME LINHA\n";
+					}
+					
+				}
+					
+				
+				
 			}
 						
 			existe = 0;
@@ -366,7 +388,7 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 		for (itMod=defTable.begin(); itMod!=defTable.end(); ++itMod)
 			cout << posCount << ": " << itMod->first << "=>" << itMod->second<<"\n";
 		
-	cout << "****************	TABELA DE USO	****************\n";
+	cout << "****************	TABELA DE USO		****************\n";
 		for (itMod=useTable.begin(); itMod!=useTable.end(); ++it)
 			cout << posCount << ": " << itMod->first << "=>" << itMod->second<<"\n";
 		
@@ -375,6 +397,10 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 			cout << posCount << ": " << it->first << "=>" << it->second<<"\n";
 		
 
+
+	for(vector<string>::iterator it = token.begin(); it != token.end(); it++)
+		cout << *it;
+	
 	return 0;
 }
 
