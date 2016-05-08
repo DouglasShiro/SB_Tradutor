@@ -323,10 +323,10 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 			}
 			/* Diretiva IF */
 			else if(!it->first.compare("IF")){
-				rotulo = "";
-				rotulo = token[j+1];
+				valor = "";
+				valor = token[j+1];
 				/* Se o rotulo existe na tabela de simbolos */			
-				if( simbTable.find(rotulo) != simbTable.end()){
+				if( simbTable.find(valor) != simbTable.end()){
 					
 					cout << "ERRO SEMANTICO:" << lineCount << ": Rótulo redefinido: \"" << rotulo << "\"\n";
 					_erro = TRUE;
@@ -336,18 +336,28 @@ int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
 					cout << "ERRO SINTATICO:" << lineCount << ": IF deve possuir um rotulo válido\n";
 					_erro = TRUE;					
 				}
-				else{
-					
-					if(!valor.compare("0"))
-					{
-						
-						cout << "VALORIF: "<< rotulo << "\n";
-						cout<< "SOME LINHA\n";
-					}
-					
+				/*Apaga a linha do IF */	
+				string::size_type n = j;
+				while (token[n] != "\n")
+				{
+					token[n].erase();
+					n++;
 				}
-					
 				
+				if(!valor.compare("0"))
+				{
+					
+					cout << "VALORIF: "<< rotulo << "\n";
+					cout<< "SOME LINHA\n"<< token[n];
+					
+					n++;/* Apaga a linha seguinte */
+					while (token[n] != "\n")
+					{
+						token[n].erase();
+						n++;
+					}
+
+				}
 				
 			}
 						
