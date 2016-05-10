@@ -18,7 +18,10 @@ int _erro = FALSE ;
 int	_sectionText = -1, 	_sectionData = -1;
 
 
-int primeira_passagem(map<string,string> opTable, map<string,int> dirTable,
-						vector<string> token,	map<string,int> simbTable,
-						unordered_map<string,int> defTable, unordered_map<string,int>useTable);
+int primeira_passagem(map<string,string>& opTable, map<string,int>& dirTable,
+						vector<string>& token,	map<string,int>& simbTable,
+						unordered_map<string,int>& defTable, unordered_map<string,int>& useTable);
+ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
+						vector<string> &token,	map<string,int> &simbTable,
+						unordered_map<string,int> &defTable, unordered_map<string,int> &useTable);						
 int token_valido(string token);
