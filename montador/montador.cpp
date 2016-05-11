@@ -103,63 +103,44 @@ int main(int argc, char **argv)
 		cout << *it << " ";
 	}
 
-	cout << "****************	TABELA DE SIMBOLOS	****************\n";
-		for (it=simbTable.begin(); it!=simbTable.end(); ++it)
-			cout << it->first << "=>" << it->second<<"\n";
-
-
-	cout << "****************	TABLE USE		****************\n";
-	for (itUse=useTable.begin(); itUse!=useTable.end(); ++itUse)
-		cout << itUse->first << "=>" << itUse->second<<"\n";
-	reverso.insert(useTable.begin(), useTable.end());
-	 for (itUse=reverso.begin(); itUse!=reverso.end(); ++itUse)
-	 	cout << itUse->first << "=>" << itUse->second<<"\n";
-
-	cout << "****************	TABLE DEFINITION	****************\n";
-	for (itMod=defTable.begin(); itMod!=defTable.end(); ++itMod){
-		cout << itMod->first << "=>" << itMod->second<<"\n";
-	}
-
-	cout << "****************	RELATIVE	****************\n";
-		for(vector<int>::iterator it = relativo.begin(); it != relativo.end(); it++){
-			cout << *it << " ";
-		}
-		cout << "\n";
-
-	cout << "****************	CODE	****************\n";
-		for(vector<string>::iterator it = code.begin(); it != code.end(); it++){
-			cout << *it << " ";
-		}
-		cout << "\n";
-	/*ABRIR ARQUIVO SAIDA*/
-
+	/* Caso nao tenha erros gera o codigo objeto */
 	if(_erro == FALSE){
 		out = out + ".o";
 		outFile.open(out, fstream::out);	// Abre o arquivo
 
-		/*IMPRIMIR ARQUIVO SAIDA*/
-		outFile << "TABLE USE\n";
-		reverso.insert(useTable.begin(), useTable.end());
-		for (itUse=reverso.begin(); itUse!=reverso.end(); ++itUse)
-			outFile << itUse->first << "\t" << itUse->second<<"\n";
-		outFile << "\n";
+		/* Se begin e end nao existem , nao eh um modulo*/
+	    if(!_begin && !_end){
+			for(vector<string>::iterator it = code.begin(); it != code.end(); it++)
+				outFile << *it << " ";
+			cout << "TEVE ARQUIVO\n";
+	    }
+		else{/* SE eh um modulo imprime no arquivo com os cabecalhos*/
+			cout << "TEVE ARQUIVO -> MOD\n";
+			/*IMPRIMIR ARQUIVO SAIDA*/
+			outFile << "TABLE USE\n";
+			reverso.insert(useTable.begin(), useTable.end());
+			for (itUse=reverso.begin(); itUse!=reverso.end(); ++itUse)
+				outFile << itUse->first << "\t" << itUse->second<<"\n";
+			outFile << "\n";
 
-		outFile << "TABLE DEFINITION\n";
-		for (itMod=defTable.begin(); itMod!=defTable.end(); ++itMod)
-			outFile << itMod->first << "\t" << itMod->second<<"\n";
-		outFile << "\n";
+			outFile << "TABLE DEFINITION\n";
+			for (itMod=defTable.begin(); itMod!=defTable.end(); ++itMod)
+				outFile << itMod->first << "\t" << itMod->second<<"\n";
+			outFile << "\n";
 
-		outFile << "RELATIVE\n";
-		for(vector<int>::iterator it = relativo.begin(); it != relativo.end(); it++)
-			outFile << *it << " ";
-		outFile << "\n";
-		outFile << "\n";
+			outFile << "RELATIVE\n";
+			for(vector<int>::iterator it = relativo.begin(); it != relativo.end(); it++)
+				outFile << *it << " ";
+			outFile << "\n";
+			outFile << "\n";
 
-		outFile << "CODE\n";
-		for(vector<string>::iterator it = code.begin(); it != code.end(); it++)
-			outFile << *it << " ";
-		outFile << "\n";
-		outFile << "\n";
+			outFile << "CODE\n";
+			for(vector<string>::iterator it = code.begin(); it != code.end(); it++)
+				outFile << *it << " ";
+			outFile << "\n";
+			outFile << "\n";
+
+	    }
 
 		/*FECHA ARQUIVO SAIDA*/
 		outFile.close();
@@ -194,8 +175,7 @@ int primeira_passagem(map<string,string>& opTable, map<string,int>& dirTable,
 						unordered_map<string,int>& defTable, unordered_multimap<string,int>& useTable){
 
 	char c;
-	int existe = 0,  posCount = 0, lineCount = 1,
-		begin = 0, end = 0;
+	int existe = 0,  posCount = 0, lineCount = 1, temData = FALSE;
 	string rotulo, str, valor;
 	map<string,int>::iterator it;
 	map<string,string>::iterator itOp;
@@ -207,22 +187,36 @@ int primeira_passagem(map<string,string>& opTable, map<string,int>& dirTable,
 
 		/* Verifica se eh um rotulo */
 		if(token[j].find(":") != string::npos){
-
+			/* retira os : do rotulo */
 			rotulo = token[j].substr(0, token[j].length()-1);
+			/* verifica se o token anterior era um rotulo */
 			if(existe == 1){
 
-				cout << "ERRO SINTATICO:" << lineCount << ": Rótulo depois de um rótulo: "<< rotulo << "\n";
-				_erro = TRUE;
+				if(token[j+1].compare("CONST") || token[j+1].compare("SPACE")){
+					cout << "ERRO SINTATICO:" << lineCount << ": Duas declarações na mesma linha\n";
+					_erro = TRUE;
+				}
+				else{
+
+					cout << "ERRO SINTATICO:" << lineCount << ": Dois rótulos na mesma linha\n";
+					_erro = TRUE;
+
+				}
+
 			}
 
 			if(token_valido(rotulo)){
-
+				/* Verifica se o rotulo ja foi definido */
 				it = simbTable.find(rotulo);
 				if(it != simbTable.end()){
-
-					cout << "ERRO SEMANTICO:" << lineCount << ": Rótulo redefinido: \"" << rotulo << "\"\n";
-					_erro = TRUE;
-				}
+					if(token[j+1].compare("CONST") || token[j+1].compare("SPACE")){
+						cout << "ERRO SEMANTICO:" << lineCount << ": Declaração repetida\n";
+						_erro = TRUE;
+					}
+					else{
+						cout << "ERRO SEMANTICO:" << lineCount << ": Rótulo repetido\n";
+						_erro = TRUE;
+					}				}
 				else if(existe == 0){
 					simbTable[rotulo] = posCount;
 				}
@@ -232,7 +226,7 @@ int primeira_passagem(map<string,string>& opTable, map<string,int>& dirTable,
 			}
 			else{
 
-				cout << "ERRO LEXICO:" << lineCount << ": Token inválido: \"" << token[j] << "\"\n";
+				cout << "ERRO LEXICO:" << lineCount << ": Token inválido\n";
 				_erro = TRUE;
 			}
 
@@ -241,15 +235,18 @@ int primeira_passagem(map<string,string>& opTable, map<string,int>& dirTable,
 		/* Verifica se eh um operacao */
 		else if((itOp = opTable.find(token[j])) != opTable.end()){
 		/* Verifica se a instrucao esta na secao TEXT*/
-			if(_sectionText > posCount)	{
-					cout << "ERRO SEMANTICO:" << lineCount << ": A operação está fora da seção de texto \n";
-					_erro = TRUE;
 
-			} /* Verifica de a instrucao esta na secao DATA*/
-			else if((_sectionData < posCount) && (_sectionData != -1)){
-					cout << "ERRO SEMANTICO:" << lineCount << ": A operação está fora da seção de texto \n";
-					_erro = TRUE;
 
+			if((_sectionText > posCount) && (_sectionText != -1))
+			{
+				cout << "ERRO SEMANTICO:" << lineCount << ": A operação está fora da seção de texto1 \n";
+				_erro = TRUE;
+
+			}
+			if ((_sectionData <= posCount) && (_sectionData != -1))	{
+
+				cout << "ERRO SEMANTICO:" << lineCount << ": A operação está fora da seção de texto2 \n";
+				_erro = TRUE;
 			}
 
 			/* Caso seja COPY-> tam 3*/
@@ -274,47 +271,48 @@ int primeira_passagem(map<string,string>& opTable, map<string,int>& dirTable,
 			if(!it->first.compare("SPACE")){
 				str = token[++j];
 				int space = 0;
+				temData = TRUE;
 
-
-				/* Verifica se a secao de dados existe */
-				if(_sectionData == -1)
-				{
-					cout << "ERRO SEMANTICO: SECTION DATA faltante \n";
+				/* Verifica de a instrucao esta na secao DATA */
+				if((_sectionData < _sectionText) || (_sectionData > posCount) || (_sectionData == -1)){
+					cout << "ERRO SEMANTICO:" << lineCount << ": A diretiva " << it->first << " está fora da seção de dados\n";
 					_erro = TRUE;
-				}/* Verifica de a instrucao esta na secao DATA */
-				else if((_sectionData < _sectionText) || (_sectionData > posCount)){
-						cout << "ERRO SEMANTICO:" << lineCount << ": A diretiva " << token[j] << " está fora da seção DATA\n";
-						_erro = TRUE;
 				}
 
-				for (string::size_type i = 0; i < str.length(); ++i)
+				/* Verifica se o operando eh nulo */
+				if(!str.compare("\n"))
 				{
-					c=str[i];
+					cout << "ERRO SINTATICO:"<<lineCount <<": Operando inválido\n";
+					_erro = TRUE;
+				}
+				else{
 
-					if(!isdigit(c)){
+					for (string::size_type i = 0; i < str.length(); ++i)
+					{
+						c=str[i];
 
-						cout << "ERRO SINTATICO:" << lineCount << ": Operando inválido: \"" << str << "\"\n";
-						_erro = TRUE;
-						i = str.length();
-					}else{
-						space = space *10 + (c -'0');
+						if(!isdigit(c)){
+
+							cout << "ERRO SINTATICO:" << lineCount << ": Operando inválido\n";
+							_erro = TRUE;
+							i = str.length();
+						}else{
+							space = space *10 + (c -'0');
+						}
+
 					}
+					posCount+= space;
 
 				}
-				posCount+= space;
+
 			}
 			/* Diretiva CONST */
 			else if(!it->first.compare("CONST")){
 				str = token[++j];
-
-				/* Verifica se a secao de dados existe */
-				if(_sectionData == -1)
-				{
-					cout << "ERRO SEMANTICO: SECTION DATA faltante \n";
-					_erro = TRUE;
-				}/* Verifica de a instrucao esta na secao DATA */
-				else if((_sectionData < _sectionText) || (_sectionData > posCount)){
-						cout << "ERRO SEMANTICO:" << lineCount << ": A diretiva " << token[j] << " está fora da seção DATA\n";
+				temData = TRUE;
+				/* Verifica de a instrucao esta na secao DATA */
+				if((_sectionData < _sectionText) || (_sectionData > posCount) || (_sectionData == -1)){
+						cout << "ERRO SEMANTICO:" << lineCount << ": A diretiva " << it->first << " está fora da seção de dados\n";
 						_erro = TRUE;
 				}
 
@@ -323,7 +321,7 @@ int primeira_passagem(map<string,string>& opTable, map<string,int>& dirTable,
 					c=str[i];
 					if(!isdigit(c) && c != '-'){
 
-						cout << "ERRO SINTATICO:" << lineCount << ": Operando inválido: 1 passagem \"" << str << "\"\n";
+						cout << "ERRO SINTATICO:" << lineCount << ": Operando inválido\n";
 						_erro = TRUE;
 						i = str.length();
 					}
@@ -335,21 +333,25 @@ int primeira_passagem(map<string,string>& opTable, map<string,int>& dirTable,
 			/* Diretiva EXTERN */
 			else if(!it->first.compare("EXTERN")){
 
-				rotulo = token[j-1].substr(0, token[j-1].length()-1);
-				if((it = simbTable.find(rotulo)) != simbTable.end()){
 
-					rotulo = rotulo + "#";
-					simbTable[rotulo] = 0;
-					simbTable.erase(it);
-
+				if(!token[j-1].compare("\n")){
+					cout << "ERRO SINTATICO:" << lineCount << ": Operando inválido\n";
+					_erro = TRUE;
 				}
 				else{
+					rotulo = token[j-1].substr(0, token[j-1].length()-1);
+					if((it = simbTable.find(rotulo)) != simbTable.end()){
 
-					cout << "ERRO SINTATICO:" << lineCount << ": Rótulo não identificado ou ausente\"" << rotulo << "\"\n";
-					_erro = TRUE;
+						rotulo = rotulo + "#";
+						simbTable[rotulo] = 0;
+						simbTable.erase(it);
 
+					}
+					else{
+						cout << "ERRO SEMANTICO:" << lineCount << ": Declaração ausente \n";
+						_erro = TRUE;
+					}
 				}
-
 			}
 			/* Diretiva PUBLIC */
 			else if(!it->first.compare("PUBLIC")){
@@ -357,19 +359,16 @@ int primeira_passagem(map<string,string>& opTable, map<string,int>& dirTable,
 				/* Verifica se o rotulo ja foi definido */
 				 if(!rotulo.compare("\n")){
 
-					cout << "ERRO SINTATICO:" << lineCount << ": Declaração ausente \n";
+					cout << "ERRO SINTATICO:" << lineCount << ": Operando inválido \n";
 					_erro = TRUE;
 				}
 				else{
 					if((itMod = defTable.find(rotulo)) != defTable.end()){
 
-						cout << "ERRO SEMANTICO:" << lineCount << ": Rótulo redefinido \"" << rotulo << "\"\n";
+						cout << "ERRO SEMANTICO:" << lineCount << ": Declaração repetida\n";
 						_erro = TRUE;
-
-
 					}
 					else{
-
 						defTable[rotulo] = -1;
 					}
 				}
@@ -378,33 +377,40 @@ int primeira_passagem(map<string,string>& opTable, map<string,int>& dirTable,
 			else if(!it->first.compare("EQU")){
 				valor = "";
 				valor = token[j+1];
-				 rotulo = token[j-1].substr(0, token[j-1].length()-1);
-				 if((it = simbTable.find(rotulo)) != simbTable.end()){
-
-					 simbTable.erase(it);
-					 if(find(token.begin(), token.end(), rotulo) != token.end())
-					 {
-						 cout << "valor:	\"" << valor << "\"	rotulo:	\""<< rotulo << "\"\n";
-						 replace(token.begin(), token.end(), rotulo, valor);
-
-					 }
-
-				}
-				else{
-					cout << "ERRO SINTATICO:" << lineCount << ": Rótulo não definido\n";
+				/* Verifica se existe um rotulo antes do EQU */
+				 if(!token[j-1].compare("\n"))
+				 {
+					cout << "ERRO SINTATICO:" << lineCount << ": Operando inválido\n";
 					_erro = TRUE;
+				 }
+				 else
+				 {
+					 rotulo = token[j-1].substr(0, token[j-1].length()-1);
+					 /* Procura o rotulo na tabela de rotulos */
+					if((it = simbTable.find(rotulo)) != simbTable.end()){
+						/* Apaga o simbolo da tabela e substitui o rotulo pelo valor */
+						simbTable.erase(it);
+						if(find(token.begin(), token.end(), rotulo) != token.end())
+						{
+						 replace(token.begin(), token.end(), rotulo, valor);
+						}
+					}
+					else{
+						cout << "ERRO SEMANTICO:" << lineCount << ": Declaração não definida\n";
+						_erro = TRUE;
+					}
 				}
-			}
-			/* Diretiva BEGIN */
+			}/* Diretiva BEGIN */
 			else if(!it->first.compare("BEGIN")){
-				begin = 1;
+				_begin = TRUE;
 			}
 			/* Diretiva END */
 			else if(!it->first.compare("END")){
-				end = 1;
-				if(begin == 0)
+				_end = TRUE;
+				/* Se nao existe begin mas existe end*/
+				if(!_begin)
 				{
-					cout << "ERRO SEMANTICO: Diretiva END declarada sem BEGIN\n";
+					cout << "ERRO SINTATICO: Diretiva END declarada sem BEGIN\n";
 					_erro = TRUE;
 				}
 			}
@@ -420,15 +426,13 @@ int primeira_passagem(map<string,string>& opTable, map<string,int>& dirTable,
 					_sectionData = posCount;
 				} /* Senao erro */
 				else{
-					cout << "ERRO SINTATICO:"<< lineCount <<":"<< posCount <<": Operando inválido, deve ser TEXT ou DATA\n";
+					cout << "ERRO SINTATICO:"<< lineCount <<": Operando inválido para SECTION, deve ser TEXT ou DATA\n";
 					_erro = TRUE;
 				}
 
 			}
 
-
 			existe = 0;
-
 		}
 		str = "";
 		/* Conta as linhas do programa */
@@ -437,21 +441,18 @@ int primeira_passagem(map<string,string>& opTable, map<string,int>& dirTable,
 		}
 	}
 
-
-
-
 	/* Verifica erro do BEGIN sem END */
-	if((begin == 1) && (end == 0)){
+	if((_begin == TRUE) && (_end == FALSE)){
 
-		cout << "ERRO SEMANTICO: Diretiva BEGIN declarada sem END\n";
+		cout << "ERRO SINTATICO: Diretiva BEGIN declarada sem END\n";
 		_erro = TRUE;
 	}
 
 	/* Verifica se o STOP existe */
-	if((begin == 0) && (end == 0)){
+	if((_begin == FALSE) && (_end == FALSE)){
 		if(find(token.begin(), token.end(), "STOP") == token.end()){
 
-			cout << "ERRO SEMANTICO: o programa não possui nenhuma instrução STOP\n";
+			cout << "ERRO SINTATICO: o programa não possui nenhuma instrução STOP\n";
 			_erro = TRUE;
 		}
 	}
@@ -459,28 +460,23 @@ int primeira_passagem(map<string,string>& opTable, map<string,int>& dirTable,
 	/* Verifica se a SECTION TEXT existe */
 	if(_sectionText == -1)
 	{
-		cout << "ERRO SEMANTICO: SECTION TEXT faltante \n";
+		cout << "ERRO SINTATICO: SECTION TEXT faltante \n";
 					_erro = TRUE;
 	}
 
-	/* Verifica se a SECTION TEXT esta antes da SECTION DATA */
-	if((_sectionData != -1) && _sectionData < _sectionText)
+	/* Verifica se a secao de dados existe */
+	if((_sectionData == -1) && (temData == TRUE))
 	{
-		cout << "ERRO SEMANTICO: SECTION TEXT deve vir antes da SECTION DATA \n";
+		cout << "ERRO SINTATICO: SECTION DATA faltante \n";
 		_erro = TRUE;
 	}
-	//cout << "****************	MONTADOR	****************\n";
-	//cout << "****************	TABELA DE DEFINIÇÕES	****************\n";
-		//for (itMod=defTable.begin(); itMod!=defTable.end(); ++itMod)
-			//cout << posCount << ": " << itMod->first << "=>" << itMod->second<<"\n";
 
-	//cout << "****************	TABELA DE USO		****************\n";
-		//for (itMod=useTable.begin(); itMod!=useTable.end(); ++it)
-			//cout << posCount << ": " << itMod->first << "=>" << itMod->second<<"\n";
-
-	//cout << "****************	TABELA DE SIMBOLOS	****************\n";
-		//for (it=simbTable.begin(); it!=simbTable.end(); ++it)
-			//cout << posCount << ": " << it->first << "=>" << it->second<<"\n";
+	/* Verifica se a SECTION TEXT esta antes da SECTION DATA */
+	if((_sectionData != -1) && (_sectionData < _sectionText))
+	{
+		cout << "ERRO SINTATICO: SECTION TEXT deve vir antes da SECTION DATA \n";
+		_erro = TRUE;
+	}
 
 	return 0;
 }
@@ -565,25 +561,28 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 					code.push_back(itOp->second);
 
 				}else{
-					cout << "ERRO SINTATICO:" << lineCount << ": formato invalido: STOP :\"" << token[j+1] << "\"\n";
+					cout << "ERRO SINTATICO:" << lineCount << ": Formato inválido: STOP \n";
 				}
-            // }else if((!itOp->first.compare("ADD")) || (!itOp->first.compare("SUB")) || (!itOp->first.compare("MUL")) || (!itOp->first.compare("DIV"))){
-			// 	if((it = simbTable.find(token[j+1])) != simbTable.end()){
-			// 		if(){
-			//
-			// 		}else{
-			// 			cout << "ERRO SINTATICO:" << lineCount << ": formato invalido: OP :\"" << token[j+1] << "\"\n";
-			// 		}
-			// 		cout << "ERRO SINTATICO:" << lineCount << ": formato invalido: STOP :\"" << token[j+1] << "\"\n";
-			// 	}
-			//
-			// }else if(){
-			//
-			// }else if(){
-			//
-			// }else if(){
+			}else if(!itOp->first.compare("JMP")){
+				memOp = token[j+1]; /* Operando 1 */
+				if((it = simbTable.find(memOp)) != simbTable.end()){
+					if(it->second >= _sectionData)
+					{
+						cout << "ERRO SEMANTICO:" << lineCount << ": Tipo de argumento inválido \n";
+					}
 
-			}else {
+				}
+			}else if(!itOp->first.compare("DIV")){
+				memOp = token[j+1]; /* Operando 1 */
+				if((it = simbTable.find(memOp)) != simbTable.end()){
+					if(it->second >= _sectionData)
+					{
+						cout << "ERRO SEMANTICO:" << lineCount << ": Tipo de argumento inválido \n";
+					}
+
+				}
+			}
+			 else {
 				posArray = 0;
 				memOp = token[j+1];
 				/* Verifica se possui mais de um operando */
@@ -612,7 +611,7 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 					}
 					else{
 						_erro = TRUE;
-						cout << "ERRO SEMANTICO:" << lineCount << ": Declaração ausente\n";
+						cout << "ERRO SINTATICO:" << lineCount << ": Operando inválido\n";
 					}
 
 				}
@@ -737,7 +736,7 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 				}
 				else if(!valor.compare("\n")){
 
-					cout << "ERRO SINTATICO:" << lineCount << ": Declaração ausente \n";
+					cout << "ERRO SINTATICO:" << lineCount << ": Operando inválido\n";
 					_erro = TRUE;
 				}
 				string::size_type n = j;
