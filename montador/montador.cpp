@@ -99,10 +99,10 @@ int main(int argc, char **argv)
 	segunda_passagem(opTable, dirTable,  token, simbTable, defTable, useTable, code, relativo);
 
 	/* Printa o programa com as alteracoes */
-	for(vector<string>::iterator it = token.begin(); it != token.end(); it++)
-		cout << *it << " ";
+	// for(vector<string>::iterator it = token.begin(); it != token.end(); it++)
+	// 	cout << *it << " ";
+	// }
 	}
-
 	/* Caso nao tenha erros gera o codigo objeto */
 	if(_erro == FALSE){
 		out = out + ".o";
@@ -112,10 +112,8 @@ int main(int argc, char **argv)
 	    if(!_begin && !_end){
 			for(vector<string>::iterator it = code.begin(); it != code.end(); it++)
 				outFile << *it << " ";
-			cout << "TEVE ARQUIVO\n";
 	    }
 		else{/* SE eh um modulo imprime no arquivo com os cabecalhos*/
-			cout << "TEVE ARQUIVO -> MOD\n";
 			/*IMPRIMIR ARQUIVO SAIDA*/
 			outFile << "TABLE USE\n";
 			reverso.insert(useTable.begin(), useTable.end());
@@ -252,7 +250,6 @@ int primeira_passagem(map<string,string>& opTable, map<string,int>& dirTable,
 			/* Caso seja COPY-> tam 3*/
 			if(!itOp->first.compare("COPY")){
 				posCount += 3;
-				cout << itOp->first << "\n";
 			}/* Caso seja STOP -> tam 1*/
 			else if(!itOp->first.compare("STOP")){
 				posCount += 1;
@@ -523,9 +520,6 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 							}else{
 								if((it = simbTable.find(memOp2)) != simbTable.end()){
 									/*se tudo der certo sexta tem mais um show*/
-									cout << "end" << posCount << ":\t" << itOp->first << ", ";
-									cout << memOp << ", ";
-									cout << memOp2 << "\n";
 									/*ARQUIVO SAIDA*/
 									/*salva OP CODE e end dos simbolos dos operandos de COPY*/
 									code.push_back(itOp->second);
@@ -556,7 +550,6 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 				if((it = simbTable.find(token[j+1])) == simbTable.end()){
 					//*se tudo der certo sexta tem mais um show*/
 					posCount += 1;
-					cout << "end" << posCount << ":\t" <<  itOp->first << "\n";
 					/*ARQUIVO SAIDA*/
 					code.push_back(itOp->second);
 
@@ -573,14 +566,14 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 
 				}
 			}else if(!itOp->first.compare("DIV")){
-				memOp = token[j+1]; /* Operando 1 */
-				if((it = simbTable.find(memOp)) != simbTable.end()){
-					if(it->second >= _sectionData)
-					{
-						cout << "ERRO SEMANTICO:" << lineCount << ": Tipo de argumento inválido \n";
-					}
-
-				}
+				// memOp = token[j+1]; /* Operando 1 */
+				// if((it = simbTable.find(memOp)) != simbTable.end()){
+				// 	if(it->second >= _sectionData)
+				// 	{
+				// 		cout << "ERRO SEMANTICO:" << lineCount << ": Tipo de argumento inválido \n";
+				// 	}
+				//
+				// }
 			}
 			 else {
 				posArray = 0;
@@ -598,7 +591,6 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 							/* Verifica se a posicao eh valida consultando se exite alguma
 							 * posicao maior que a posicao do memOp e menor que a posArray*/
 							for(map<string,int>::iterator itArray = simbTable.begin(); itArray != simbTable.end(); itArray++){
-								//cout << ""
 								if((itArray->second > it->second) && (itArray->second <= posArray))
 								{
 									_erro = TRUE;
@@ -620,10 +612,7 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 				if((itOp = opTable.find(token[j])) != opTable.end()){
 					/*Caso o proximo token seja um simbolo entao a operacao esta com os operandos corretos*/
 					if((it = simbTable.find(memOp)) != simbTable.end()){
-						cout << "end" << posCount << ":\t" <<  itOp->first << ", ";
-						cout <<  it->first << "\n";
 						/*ARQUIVO SAIDA*/
-						//cout <<" -- " << itOp->second << " - " << it->second;
 						code.push_back(itOp->second);
 						code.push_back(to_string(it->second));
 						relativo.push_back(posCount+1);
@@ -638,9 +627,6 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 							strAux[memOp.size()] = '\0'; //finaliza string com '\0'
 
 							useTable.insert(make_pair<string,int>(strAux, (posCount+1)));
-							//cout << "Table Use: " << memOp << ", " << posCount+1 << "\n";
-							cout << "end" << ":\t" <<  itOp->first << ", ";
-							cout <<  it->first << "\n";
 							/*ARQUIVO SAIDA*/
 							code.push_back(itOp->second);
 							code.push_back(to_string(it->second));
@@ -676,7 +662,6 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 					{
 
 						space--;
-						cout << "end" << posCount << ":\t 00 \n";
 						/*Arquivo Saida*/
 						code.push_back("00");
 						posCount+= 1;
@@ -687,9 +672,7 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 					cout << "ERRO SINTATICO:" << lineCount << ": Simbolo inválido: \"" << token[j-1] << "\"\n";
 				}
 			}else if(!it->first.compare("CONST")){
-						/* */
 						str = token[j+1];
-						cout << "end" << posCount << ":\t"<< str << "\n";
 						posCount+= 1;
 						/*Arquivo Saida*/
 						code.push_back(str);
@@ -699,10 +682,8 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 				memOp = token[j+1];
 
 				if(memOp.compare("\n")){
-					cout << "PUBLIC -> memOp:" << memOp << "\n";
 					if((it = simbTable.find(memOp)) != simbTable.end()){
 
-						cout << "PUBLIC -> memOp:" << memOp << "\n";
 						if((itMod = defTable.find(memOp)) != defTable.end()){
 							defTable[memOp] = it->second;
 						}
@@ -721,7 +702,6 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 			}else if(!it->first.compare("SECTION") || !it->first.compare("EQU")
 					|| !it->first.compare("BEGIN") || !it->first.compare("END")
 					|| !it->first.compare("EXTERN")){
-				/**/
 
 			}
 			/* Diretiva IF */
@@ -748,9 +728,6 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 				if(!valor.compare("0"))
 				{
 
-					//cout << "VALORIF: "<< rotulo << "\n";
-					//cout<< "SOME LINHA\n"<< token[n];
-
 					n++;
 					while (token[n] != "\n")
 					{
@@ -767,34 +744,5 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 			lineCount++;
 		}
     }
-	// cout << "****************	TABELA DE SIMBOLOS	****************\n";
-	// 	for (it=simbTable.begin(); it!=simbTable.end(); ++it)
-	// 		cout << posCount << ": " << it->first << "=>" << it->second<<"\n";
-	//
-	//
-	// cout << "****************	TABELA DE USO		****************\n";
-	// 	unordered_map<string, int> reverso;
-	// 	for (itUse=useTable.begin(); itUse!=useTable.end(); ++itUse)
-	// 		reverso[itUse->first] = itUse->second;
-	//
-	// 	for (itUse=reverso.begin(); itUse!=reverso.end(); ++itUse)
-	// 		cout << posCount << ": " << itUse->first << "=>" << itUse->second<<"\n";
-	//
-	//
-	// cout << "****************	TABELA DE DEFINIÇÕES	****************\n";
-	// 	for (itMod=defTable.begin(); itMod!=defTable.end(); ++itMod)
-	// 		cout << posCount << ": " << itMod->first << "=>" << itMod->second<<"\n";
-	//
-	// cout << "****************	RELATIVO	****************\n";
-	// 	for(vector<int>::iterator it = relativo.begin(); it != relativo.end(); it++){
-	// 		cout << *it << " ";
-	// 	}
-	// 	cout << "\n";
-	//
-	// cout << "****************	CODIGO OBJETO	****************\n";
-	// 	for(vector<string>::iterator it = code.begin(); it != code.end(); it++){
-	// 		cout << *it << " ";
-	// 	}
-	// 	cout << "\n";
 return 0;
 }

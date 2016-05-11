@@ -28,6 +28,7 @@ Compilação:
 Execucao:
 
 	Para montador:
+	arquivo de entrada precisa estar dentro da pasta /montador
 	./montador nome_arquivo_entrada nome_arquivo_saida
 
 	Para ligador:

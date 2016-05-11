@@ -28,9 +28,11 @@ Compilação:
 Execucao:
 
 	Para montador:
+	arquivo de entrada precisa estar dentro da pasta /montador
 	./montador nome_arquivo_entrada nome_arquivo_saida
 
 	Para ligador:
+	arquivos de entrada precisam estar dentro da pasta /ligador/src
 	./ligador nome_arquivo_entrada1 nome_arquivo_entrada2 nome_arquivo_saida
 
 Sistema Operacional:
