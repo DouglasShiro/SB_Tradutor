@@ -13,6 +13,30 @@ Objetivo:
     Fixar o funcionamento de um processo de traducao. Especificamente as etapas
 de analise lexica, sintatica e semantica e a etapa de geracao de codigo objeto.
 
+Compilação:
 
+	Para montador:
+		ir para a pasta /montador 
+	
+		g++ -Wall -pedantic -std=c++11 montador.cpp -o montador
 
+	Para ligador:
+
+		ir para a pasta /ligador/src
+		make
+
+Execucao:
+
+	Para montador:
+	./montador nome_arquivo_entrada nome_arquivo_saida
+
+	Para ligador:
+	./ligador nome_arquivo_entrada1 nome_arquivo_entrada2 nome_arquivo_saida
+
+Sistema Operacional:
+	-Linux 4.2.0-36-generic #41-Ubuntu GNU/Linux (Ubuntu 15.10)
+	("coloca o seu tbm andressa", peguei pelo comando uname -a)
+	
+versão gcc:
+	gcc (Ubuntu 5.2.1-22ubuntu2) 5.2.1 20151010
 

@@ -103,35 +103,35 @@ int main(int argc, char **argv)
 		cout << *it << " ";
 	}
 
-	// cout << "****************	TABELA DE SIMBOLOS	****************\n";
-	// 	for (it=simbTable.begin(); it!=simbTable.end(); ++it)
-	// 		cout << it->first << "=>" << it->second<<"\n";
-	//
-	//
-	// cout << "****************	TABLE USE		****************\n";
-	// for (itUse=useTable.begin(); itUse!=useTable.end(); ++itUse)
-	// 	cout << itUse->first << "=>" << itUse->second<<"\n";
-	// reverso.insert(useTable.begin(), useTable.end());
-	//  for (itUse=reverso.begin(); itUse!=reverso.end(); ++itUse)
-	//  	cout << itUse->first << "=>" << itUse->second<<"\n";
-	//
-	// cout << "****************	TABLE DEFINITION	****************\n";
-	// for (itMod=defTable.begin(); itMod!=defTable.end(); ++itMod){
-	// 	cout << itMod->first << "=>" << itMod->second<<"\n";
-	// }
-	//
-	// cout << "****************	RELATIVE	****************\n";
-	// 	for(vector<int>::iterator it = relativo.begin(); it != relativo.end(); it++){
-	// 		cout << *it << " ";
-	// 	}
-	// 	cout << "\n";
-	//
-	// cout << "****************	CODE	****************\n";
-	// 	for(vector<string>::iterator it = code.begin(); it != code.end(); it++){
-	// 		cout << *it << " ";
-	// 	}
-	// 	cout << "\n";
-	// /*ABRIR ARQUIVO SAIDA*/
+	cout << "****************	TABELA DE SIMBOLOS	****************\n";
+		for (it=simbTable.begin(); it!=simbTable.end(); ++it)
+			cout << it->first << "=>" << it->second<<"\n";
+
+
+	cout << "****************	TABLE USE		****************\n";
+	for (itUse=useTable.begin(); itUse!=useTable.end(); ++itUse)
+		cout << itUse->first << "=>" << itUse->second<<"\n";
+	reverso.insert(useTable.begin(), useTable.end());
+	 for (itUse=reverso.begin(); itUse!=reverso.end(); ++itUse)
+	 	cout << itUse->first << "=>" << itUse->second<<"\n";
+
+	cout << "****************	TABLE DEFINITION	****************\n";
+	for (itMod=defTable.begin(); itMod!=defTable.end(); ++itMod){
+		cout << itMod->first << "=>" << itMod->second<<"\n";
+	}
+
+	cout << "****************	RELATIVE	****************\n";
+		for(vector<int>::iterator it = relativo.begin(); it != relativo.end(); it++){
+			cout << *it << " ";
+		}
+		cout << "\n";
+
+	cout << "****************	CODE	****************\n";
+		for(vector<string>::iterator it = code.begin(); it != code.end(); it++){
+			cout << *it << " ";
+		}
+		cout << "\n";
+	/*ABRIR ARQUIVO SAIDA*/
 
 	if(_erro == FALSE){
 		out = out + ".o";
@@ -567,7 +567,23 @@ int segunda_passagem(map<string,string> &opTable, map<string,int> &dirTable,
 				}else{
 					cout << "ERRO SINTATICO:" << lineCount << ": formato invalido: STOP :\"" << token[j+1] << "\"\n";
 				}
-            } else {
+            // }else if((!itOp->first.compare("ADD")) || (!itOp->first.compare("SUB")) || (!itOp->first.compare("MUL")) || (!itOp->first.compare("DIV"))){
+			// 	if((it = simbTable.find(token[j+1])) != simbTable.end()){
+			// 		if(){
+			//
+			// 		}else{
+			// 			cout << "ERRO SINTATICO:" << lineCount << ": formato invalido: OP :\"" << token[j+1] << "\"\n";
+			// 		}
+			// 		cout << "ERRO SINTATICO:" << lineCount << ": formato invalido: STOP :\"" << token[j+1] << "\"\n";
+			// 	}
+			//
+			// }else if(){
+			//
+			// }else if(){
+			//
+			// }else if(){
+
+			}else {
 				posArray = 0;
 				memOp = token[j+1];
 				/* Verifica se possui mais de um operando */

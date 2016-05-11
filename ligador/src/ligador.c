@@ -139,17 +139,15 @@ void corrige_endereco(FILE* modulo, FILE* out, Tab_lst* TabUso,
 
     int end = 0; /*Inicializado como zero, pois indica o inicio do codigo obj*/
     int dado;
+    int auxDado;
     int i = 0;
     char secao[10];
     Tab_lst* TabUsoAux = TabUso;
-    print_tab_lst(TabUso);
-    printf("----\n");
-    print_tab_lst(TabGlobalDef);
 
     /*Percorre modulo ate secao de CODE(codigo objeto)*/
     fscanf(modulo, "%s", secao);
     while(strcmp(secao, "CODE") != 0){
-      fscanf(modulo, "%s", secao);
+        fscanf(modulo, "%s", secao);
     }
     /*Faz a leitura do codigo objeto*/
     while(fscanf(modulo, "%d", &dado) != EOF){
@@ -161,13 +159,17 @@ void corrige_endereco(FILE* modulo, FILE* out, Tab_lst* TabUso,
                 if(TabUsoAux->valor == end){
                     /*Caso esteja este eh atualizado de acordo com o
                     valor presente na tabela global de definicoes*/
-                    dado += procura_tab_lst(TabGlobalDef, TabUsoAux->simb);
-                    TabUsoAux = TabUsoAux->next;
-                    i++;
-                    printf("aqui: end%d-- ", end);
+                    /*verifica se simbolo está na tabela de definicoes*/
+                    auxDado = procura_tab_lst(TabGlobalDef, TabUsoAux->simb);
+                    if(auxDado == -1){
+                        printf("ERRO SEMANTICO: \n");
+                    }else{
+                        dado += auxDado;
+                        TabUsoAux = TabUsoAux->next;
+                        i++;
+                    }
                 }else{
                     dado += fatorCorrecao;
-                    // printf("end3: %d\n", end);
                     i++;
                 }
             }
@@ -176,6 +178,5 @@ void corrige_endereco(FILE* modulo, FILE* out, Tab_lst* TabUso,
         /*salva valor no arquivo de saida, que eh o codigo objeto ligado*/
         fprintf(out, "%d ", dado);
     }
-
     return;
 }

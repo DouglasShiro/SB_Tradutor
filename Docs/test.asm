@@ -1,13 +1,13 @@
 LA: EQU 1
-MOD_A: BEGIN
-SECTION 
+;MOD_A: BEGIN
+SECTION
 
-	R: EXTERN	;isto eh um comentario oioioi
+;	R: EXTERN	;isto eh um comentario oioioi
 
-	MOD_B: EXTERN
-	PUBLIC A
-	PUBLIC B
-	PUBLIC L1
+;	MOD_B: EXTERN
+;	PUBLIC A
+;	PUBLIC B
+;	PUBLIC L1
 	INPUT A
 	COPY A, B
 	INPUT B
@@ -23,9 +23,9 @@ SECTION
 
 SECTION DATA
 A: SPACE 1
-B: CONST 19
+B: CONST 2
 ;C: CONST
-END
+;END
 ;
 ;;;;;;;
 ;cometariooooooooooooooooooooooooooooooooooooooooooooo
