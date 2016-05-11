@@ -11,7 +11,9 @@ int main(int argc, char** argv){
 
     int fatorCorrecao = 0;
 
-    char* nomeArquivo;
+    char nomeArquivo1[20];
+    char nomeArquivo2[20];
+    char nomeArquivo3[20];
 
     /*MODULOS*/
     FILE *modA;
@@ -24,14 +26,21 @@ int main(int argc, char** argv){
     Tab_lst* TabUsoB = inicialize_tab_lst();
     Tab_lst* TabDefB = inicialize_tab_lst();
     Tab_lst* TabGlobalDef = inicialize_tab_lst();
+    int relativoA[2000];
+    int relativoB[2000];
 
     if( argc == 4){
-        nomeArquivo = argv[1];
-        modA = fopen(nomeArquivo, "r");
-        nomeArquivo = argv[2];
-        modB = fopen(nomeArquivo, "r");
-        nomeArquivo = argv[3];
-        out = fopen(nomeArquivo, "w");
+        strcpy(nomeArquivo1,argv[1]);
+        strcpy(nomeArquivo2,argv[2]);
+        strcpy(nomeArquivo3,argv[3]);
+
+        strcat(nomeArquivo1,".o");
+        strcat(nomeArquivo2,".o");
+        strcat(nomeArquivo3,".e");
+
+        modA = fopen(nomeArquivo1, "r");
+        modB = fopen(nomeArquivo2, "r");
+        out = fopen(nomeArquivo3, "w");
 
         /*verifica erro ao abrir arquivos*/
         if((modA != NULL) && (modB != NULL) && (out != NULL)){
@@ -41,20 +50,21 @@ int main(int argc, char** argv){
                 - leitura enderecos relativos
                 - uniao codigos objetos modA e modB*/
 
-            ler_objeto(modA, &TabUsoA, &TabDefA, &TabGlobalDef, &fatorCorrecao, 0);
-            ler_objeto(modB, &TabUsoB, &TabDefB, &TabGlobalDef, &fatorCorrecao, 1);
+            ler_objeto(modA, &TabUsoA, &TabDefA, &TabGlobalDef, &fatorCorrecao, 0, relativoA);
+            ler_objeto(modB, &TabUsoB, &TabDefB, &TabGlobalDef, &fatorCorrecao, 1, relativoB);
 
             /*Retornando ao inicio do arquivo*/
             rewind(modA);
             rewind(modB);
 
             /*Corrige e grava o codigo objeto no arquivo de saida*/
-            corrige_endereco(modA, out, TabUsoA, TabGlobalDef);
-            corrige_endereco(modB, out, TabUsoB, TabGlobalDef);
+            corrige_endereco(modA, out, TabUsoA, TabGlobalDef, 0, relativoA);
+            corrige_endereco(modB, out, TabUsoB, TabGlobalDef, fatorCorrecao, relativoB);
 
             fclose(out);
         }else{
             printf("ERRO: falha ao abrir arquivo\n\n");
+
         }
     }else{
         printf("ERRO: argumento(s) invalido(s).");
@@ -66,11 +76,13 @@ int main(int argc, char** argv){
     return 0;
 }
 
-void ler_objeto(FILE* modulo, Tab_lst **TabUso, Tab_lst **TabDef, Tab_lst **TabGlobalDef, int *fatorCorrecao, int i){
+void ler_objeto(FILE* modulo, Tab_lst **TabUso, Tab_lst **TabDef,
+                Tab_lst **TabGlobalDef, int *fatorCorrecao, int i, int *relativo){
 
   int dado;
   char rotulo[10];
   char secao[10];
+  int k = 0;
 
   /*LEITURA DAS SECOES DO CODIGO OBJ DO MODULO*/
   fscanf(modulo, "%s", secao);
@@ -84,6 +96,7 @@ void ler_objeto(FILE* modulo, Tab_lst **TabUso, Tab_lst **TabDef, Tab_lst **TabG
            if(strcmp(secao, "TABLE") != 0){
               strcpy(rotulo, secao);
               fscanf(modulo, "%d", &dado);
+              //printf("%d\n", dado);
               *TabUso = insert_tab_lst(*TabUso, rotulo, dado);
            }
       }
@@ -104,28 +117,34 @@ void ler_objeto(FILE* modulo, Tab_lst **TabUso, Tab_lst **TabDef, Tab_lst **TabG
 
       /*SECAO RELATIVE*/
       while(strcmp(secao, "CODE") != 0){
-          /*Percorre secao dos enderecos relativos*/
-          fscanf(modulo, "%s ", secao);
-          // if(strcmp(secao, "CODE") != 0){
-          //     dado = atoi(secao);
-          // }
+            /*Percorre secao dos enderecos relativos*/
+            fscanf(modulo, "%s ", secao);
+            relativo[k++] = atoi(secao);
+
       }
 
       /*SECAO CODE*/
       while(fscanf(modulo, "%d", &dado) != EOF){
-          *fatorCorrecao+=1;
+          if(i == 0){
+              *fatorCorrecao+=1;
+          }
       }
 
     }
 return;
 }
 
-void corrige_endereco(FILE* modulo, FILE* out, Tab_lst* TabUso, Tab_lst* TabGlobalDef){
+void corrige_endereco(FILE* modulo, FILE* out, Tab_lst* TabUso,
+                    Tab_lst* TabGlobalDef, int fatorCorrecao,  int *relativo){
 
     int end = 0; /*Inicializado como zero, pois indica o inicio do codigo obj*/
     int dado;
+    int i = 0;
     char secao[10];
     Tab_lst* TabUsoAux = TabUso;
+    print_tab_lst(TabUso);
+    printf("----\n");
+    print_tab_lst(TabGlobalDef);
 
     /*Percorre modulo ate secao de CODE(codigo objeto)*/
     fscanf(modulo, "%s", secao);
@@ -136,12 +155,21 @@ void corrige_endereco(FILE* modulo, FILE* out, Tab_lst* TabUso, Tab_lst* TabGlob
     while(fscanf(modulo, "%d", &dado) != EOF){
         /*Verifica tabela de uso*/
         if(TabUsoAux != NULL){
-            /*Verifica se o endereco do codigo obj esta na tabela de uso*/
-            if(TabUsoAux->valor == end){
-                /*Caso esteja este eh atualizado de acordo com o
-                  valor presente na tabela global de definicoes*/
-                dado += procura_tab_lst(TabGlobalDef, TabUsoAux->simb);
-                TabUsoAux = TabUsoAux->next;
+            /*Verifica se o endereco e relativo*/
+            if(relativo[i] == end){
+                /*Verifica se o endereco do codigo obj esta na tabela de uso*/
+                if(TabUsoAux->valor == end){
+                    /*Caso esteja este eh atualizado de acordo com o
+                    valor presente na tabela global de definicoes*/
+                    dado += procura_tab_lst(TabGlobalDef, TabUsoAux->simb);
+                    TabUsoAux = TabUsoAux->next;
+                    i++;
+                    printf("aqui: end%d-- ", end);
+                }else{
+                    dado += fatorCorrecao;
+                    // printf("end3: %d\n", end);
+                    i++;
+                }
             }
         }
         end++;
